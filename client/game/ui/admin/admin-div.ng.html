@@ -34,7 +34,7 @@
         <button ng-repeat="faction in factions" class="ibutton" click-sound ng-click="$parent.factions_mode = ''+faction.name" style="width:145px;">{{faction.name}}</button>
         <div ng-if="factions_mode == 'All'">
             <h2>Summary</h2>
-            <table class="table table-bordered table-hover table-condensed">
+            <table>
                 <thead>
                     <tr>
                         <th align="left">Faction</th>
@@ -51,7 +51,19 @@
         </div>
         <div ng-repeat="faction in factions">
             <div ng-if="factions_mode == faction.name">
-                <h2>{{factions_mode}}</h2>
+                <h2>{{faction.name}} ({{faction.count}})</h2>
+                <table ng-if="faction.npcs">
+                    <thead>
+                        <tr>
+                            <th align="left">NPC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="npc in faction.npcs" ng-if="npc">
+                            <td align="left">{{npc}}</td>
+                        </tr>
+                    </tbody>
+            </table>
             </div>
         </div>
     </div>

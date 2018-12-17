@@ -25,6 +25,17 @@ angular.module('game.ui.admin.adminDiv', [
                     // out how these can be autoread and sent to the client
                     $scope.charImages = IB_CONSTANTS.charImages;
 
+                    $scope.factions = [
+                        {name: "Bandit", count: "2"},
+                        {name: "Bunny", count: "3"},
+                        {name: "Goblin", count: "6"},
+                        {name: "Human", count: "5"},
+                        {name: "Ninja", count: "1"},
+                        {name: "Oni", count: "1"},
+                        {name: "Samurai", count: "2"},
+                        {name: "Wilderness", count: "35"}
+                    ];
+
                     var updateCharacterPreview = function () {
                         var data = {};
                         _.each($scope.charPreview, function(val, key) {

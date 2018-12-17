@@ -3,6 +3,7 @@
         <h1>Admin panel</h1>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'itemids'" style="width:145px;">Item IDs</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'skinids'" style="width:145px;">Skin/Armor IDs</button>
+        <button class="ibutton" click-sound ng-click="$parent.mode = 'factions'" style="width:145px;">Factions</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'npcbuilder'" style="width:145px;">NPC Builder</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'cheats'" style="width:145px;">Cheats</button>
     </div>
@@ -24,6 +25,33 @@
             <div ng-repeat="img in list" style="display:inline-block;padding-bottom:30px;" ng-if="img">
                 <div style="position:absolute">{{ img }}</div>
                 <img ng-src="images/characters/{{ name }}/{{ img }}.png" ng-style="{ 'width': name == 'head' || name == 'hair' ? '32px' : '96px'}">
+            </div>
+        </div>
+    </div>
+    <div ng-if="mode =='factions'" ng-init="factions_mode='All'">
+        <h1>NPC Factions: {{factions_mode}}</h1>
+        <button class="ibutton" click-sound ng-click="factions_mode = 'All'" style="width:145px;">All</button>
+        <button ng-repeat="faction in factions" class="ibutton" click-sound ng-click="$parent.factions_mode = ''+faction.name" style="width:145px;">{{faction.name}}</button>
+        <div ng-if="factions_mode == 'All'">
+            <h2>Summary</h2>
+            <table class="table table-bordered table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <th align="left">Faction</th>
+                        <th align="right">#</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="faction in factions" ng-if="faction">
+                        <td align="left">{{faction.name}}</td>
+                        <td align="right">{{faction.count}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div ng-repeat="faction in factions">
+            <div ng-if="factions_mode == faction.name">
+                <h2>{{factions_mode}}</h2>
             </div>
         </div>
     </div>

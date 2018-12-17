@@ -1,0 +1,12 @@
+{ 
+	"factions": [
+		{"name": "Bandit", "count": "2"},
+		{"name": "Bunny", "count": "3"},
+		{"name": "Goblin", "count": "6"},
+		{"name": "Human", "count": "5"},
+		{"name": "Ninja", "count": "1"},
+		{"name": "Oni", "count": "1"},
+		{"name": "Samurai", "count": "2"},
+		{"name": "Wilderness", "count": "35"}
+	]
+}

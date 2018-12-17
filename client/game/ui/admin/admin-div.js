@@ -13,7 +13,7 @@ angular.module('game.ui.admin.adminDiv', [
                 scope: {
                     cheats: '='
                 },
-                controller: ["$scope", "$clientSettings", "CharBuilder", "IB_CONSTANTS", '$meteor', function($scope, $clientSettings, CharBuilder, IB_CONSTANTS, $meteor) {
+                controller: ["$scope", "$http", "$clientSettings", "CharBuilder", "IB_CONSTANTS", '$meteor', function($scope, $http, $clientSettings, CharBuilder, IB_CONSTANTS, $meteor) {
 
                     var ctrl = this;
 
@@ -25,16 +25,17 @@ angular.module('game.ui.admin.adminDiv', [
                     // out how these can be autoread and sent to the client
                     $scope.charImages = IB_CONSTANTS.charImages;
 
-                    $scope.factions = [
-                        {name: "Bandit", count: "2"},
-                        {name: "Bunny", count: "3"},
-                        {name: "Goblin", count: "6"},
-                        {name: "Human", count: "5"},
-                        {name: "Ninja", count: "1"},
-                        {name: "Oni", count: "1"},
-                        {name: "Samurai", count: "2"},
-                        {name: "Wilderness", count: "35"}
-                    ];
+                    $scope.factions = [];
+
+                    $http.get("/audit/factions.json").success(function(response) {
+                        if(response.factions) {
+                            $scope.factions = response.factions;
+                        } else {
+                            console.log("Warning: could not find faction data in response.");
+                        }
+                    }).error(function(response){
+                        console.log("Request error: could not retrieve faction data.");
+                    });
 
                     var updateCharacterPreview = function () {
                         var data = {};

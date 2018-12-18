@@ -26,40 +26,9 @@ angular.module('game.ui.admin.adminDiv', [
                     // out how these can be autoread and sent to the client
                     $scope.charImages = IB_CONSTANTS.charImages;
 
-                    $scope.audit = { date : "" };
-
-                    $http.get("/audit/audit.json").success(function(response) {
-                        if(response.date) {
-                            $scope.audit.date = response.date;
-                        } else {
-                            console.log("Warning: could not find audit date in response.");
-                        }
-                    }).error(function(response){
-                        console.log("Request error: could not retrieve audit data.");
-                    });
-
                     $meteor.subscribe("factions");
 
                     $scope.factions = $meteor.collection(FactionsCollection);
-
-                    $scope.item_types = []
-                    $scope.rarities = [];
-
-                    $http.get("/audit/items.json").success(function(response) {
-                        if(response.item_types) {
-                            $scope.item_types = response.item_types;
-                        } else {
-                            console.log("Warning: could not find item-type data in response.");
-                        }
-
-                        if(response.rarities) {
-                            $scope.rarities = response.rarities;
-                        } else {
-                            console.log("Warning: could not find item rarity data in response.");
-                        }
-                    }).error(function(response){
-                        console.log("Request error: could not retrieve item data.");
-                    });
 
                     var updateCharacterPreview = function () {
                         var data = {};

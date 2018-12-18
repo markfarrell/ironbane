@@ -3,11 +3,9 @@
         <h1>Admin panel</h1>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'itemids'" style="width:145px;">Item IDs</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'skinids'" style="width:145px;">Skin/Armor IDs</button>
-        <button class="ibutton" click-sound ng-click="$parent.mode = 'npcbuilder'" style="width:145px;">NPC Builder</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'cheats'" style="width:145px;">Cheats</button>
-        <h2>Audit</h2>
-        <h3 ng-if="audit.date">{{audit.date}}</h3>
-        <button class="ibutton" click-sound ng-click="$parent.mode = 'items'" style="width:145px;">Items</button>
+        <h2>NPCs</h2>
+        <button class="ibutton" click-sound ng-click="$parent.mode = 'npcbuilder'" style="width:145px;">NPC Builder</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'factions'" style="width:145px;">Factions</button>
     </div>
     <div ng-if="mode">
@@ -69,39 +67,6 @@
             </table>
             </div>
         </div>
-    </div>
-    <div ng-if="mode=='items'">
-        <h1>Items</h1>
-        <h2>Item Types</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th align="left">Type</th>
-                    <th align="right">#</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="item_type in item_types" ng-if="item_type">
-                    <td align="left">{{item_type.name}}</td>
-                    <td align="right">{{item_type.count}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <h2>Item Rarities</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th align="left">Rarity</th>
-                    <th align="right">#</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="rarity in rarities" ng-if="rarity">
-                    <td align="left">{{rarity.name}}</td>
-                    <td align="right">{{rarity.count}}</td>
-                </tr>
-            </tbody>
-        </table>
     </div>
     <div ng-if="mode == 'npcbuilder'" class="npcbuilder">
         <h1>NPC Builder</h1>

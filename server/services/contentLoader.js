@@ -1,9 +1,11 @@
 angular
     .module('services.contentLoader', [
+        'underscore',
         'global.constants',
-        'engine.util'
+        'engine.util',
+        'models.factions'
     ])
-    .service('ContentLoader', ["IB_CONSTANTS", "$q", "IbUtils", function(IB_CONSTANTS, $q, IbUtils) {
+    .service('ContentLoader', ["_", "FactionsCollection", "IB_CONSTANTS", "$q", "IbUtils", function(_, FactionsCollection, IB_CONSTANTS, $q, IbUtils) {
         'use strict';
 
         var parse = Meteor.npmRequire('csv-parse');
@@ -345,7 +347,51 @@ angular
 
                 console.log('Loaded ' + rawItems.length + ' items');
                 console.log('Loaded ' + rawNpcs.length + ' NPC prefabs');
-            });
+
+                return npcPrefabs;
+
+
+            }).then(function(prefabs) { // Prefabs -> Factions (ex. for client UI)
+                var capitalize = function(str) {
+                    return str.charAt(0).toUpperCase() + str.substring(1).toLowerCase();
+                }; // Retrieved from UnderscoreJS website (12/18/2018).
+                var factions = _.chain(prefabs)
+                    .pairs()
+                    .map(function(pair) { 
+                        var name = pair[0];
+                        var prefab = pair[1];
+                        var faction = prefab.components.fighter.faction;
+                        return [name, faction];
+                    })
+                    .groupBy(function(pair) { 
+                        var faction = pair[1];
+                        return faction;
+                    })
+                    .pairs()
+                    .map(function(pair) {
+                        var faction_name = capitalize(pair[0]);
+                        var faction_npcs = _.map(pair[1], _.first);
+                        var faction_count = _.size(faction_npcs);
+                        return {
+                            name : faction_name,
+                            count: faction_count,
+                            npcs: faction_npcs
+                        };
+                    })
+                    .reject(function(faction) {
+                        return !faction.name;
+                    })
+                    .value();
+                return factions;
+            }).then(Meteor.bindEnvironment(function(factions) { // Rewrite factions collection
+                FactionsCollection.remove({});
+                _.each(factions, function(faction) {
+                    faction.id = FactionsCollection.insert(faction); 
+                });
+                Meteor.publish('factions', function() {
+                    return FactionsCollection.find({});
+                });
+            }));
         };
 
         this.hasNPCPrefab = function(prefabName) {

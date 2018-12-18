@@ -9,5 +9,6 @@ angular
         'models.inventory',
         'models.servers',
         'models.roles',
+        'models.factions',
         'models.zones'
     ]);

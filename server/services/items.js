@@ -118,6 +118,7 @@ angular
                 });
 
                 console.log('Loaded ' + rows.length + ' items into Meteor collection');
+
             }), function(err) {
                 console.log('Error loading items! ', err.message);
             });

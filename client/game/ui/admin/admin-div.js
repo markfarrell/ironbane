@@ -1,7 +1,8 @@
 angular.module('game.ui.admin.adminDiv', [
         'game.clientSettings',
         'global.constants',
-        'angular-meteor'
+        'angular-meteor',
+        'models.factions'
     ])
     .directive('adminDiv', function() {
             'use strict';
@@ -13,7 +14,7 @@ angular.module('game.ui.admin.adminDiv', [
                 scope: {
                     cheats: '='
                 },
-                controller: ["$scope", "$http", "$clientSettings", "CharBuilder", "IB_CONSTANTS", '$meteor', function($scope, $http, $clientSettings, CharBuilder, IB_CONSTANTS, $meteor) {
+                controller: ["$scope", "$http", "$clientSettings", "FactionsCollection", "CharBuilder", "IB_CONSTANTS", '$meteor', function($scope, $http, $clientSettings, FactionsCollection, CharBuilder, IB_CONSTANTS, $meteor) {
 
                     var ctrl = this;
 
@@ -37,17 +38,9 @@ angular.module('game.ui.admin.adminDiv', [
                         console.log("Request error: could not retrieve audit data.");
                     });
 
-                    $scope.factions = [];
+                    $meteor.subscribe("factions");
 
-                    $http.get("/audit/npcs.json").success(function(response) {
-                        if(response.factions) {
-                            $scope.factions = response.factions;
-                        } else {
-                            console.log("Warning: could not find faction data in response.");
-                        }
-                    }).error(function(response){
-                        console.log("Request error: could not retrieve faction data.");
-                    });
+                    $scope.factions = $meteor.collection(FactionsCollection);
 
                     $scope.item_types = []
                     $scope.rarities = [];

@@ -1,0 +1,23 @@
+{
+	"item_types": [
+		{"name" : "body", "count" : "16"},
+		{"name" : "cash", "count" : "5"},
+		{"name" : "feet", "count" : "19"},
+		{"name" : "food", "count" : "12"},
+		{"name" : "head", "count" : "17"},
+		{"name" : "ingredient", "count" : "4"},
+		{"name" : "misc", "count" : "8"},
+		{"name" : "poison", "count" : "2"},
+		{"name" : "potion", "count" : "3"},
+		{"name" : "relic", "count" : "25"},
+		{"name" : "shield", "count" : "1"},
+		{"name" : "weapon", "count" : "40"}
+	],
+	"rarities" : [
+		{"name" : "epic", "count" : "22"},
+		{"name" : "legendary", "count" : "18"},
+		{"name" : "normal", "count" : "84"},
+		{"name" : "strong", "count" : "16"},
+		{"name" : "weak", "count" : "12"}
+	]
+}

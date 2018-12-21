@@ -30,9 +30,9 @@
         </div>
     </div>
     <div ng-if="mode =='factions'" ng-init="factions_mode='All'">
-        <h1>NPC Factions: {{factions_mode}}</h1>
+        <h1>NPC Factions: {{capitalize(factions_mode)}}</h1>
         <button class="ibutton" click-sound ng-click="factions_mode = 'All'" style="width:145px;">All</button>
-        <button ng-repeat="faction in factions" class="ibutton" click-sound ng-click="$parent.factions_mode = ''+faction.name" style="width:145px;">{{faction.name}}</button>
+        <button ng-repeat="faction in factions" class="ibutton" click-sound ng-click="$parent.factions_mode = ''+faction.name" style="width:145px;">{{capitalize(faction.name)}}</button>
         <div ng-if="factions_mode == 'All'">
             <h2>Summary</h2>
             <table>
@@ -44,15 +44,15 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="faction in factions" ng-if="faction">
-                        <td align="left">{{faction.name}}</td>
-                        <td align="right">{{faction.count}}</td>
+                        <td align="left">{{capitalize(faction.name)}}</td>
+                        <td align="right">{{count(faction.npcs)}}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <div ng-repeat="faction in factions">
             <div ng-if="factions_mode == faction.name">
-                <h2>{{faction.name}} ({{faction.count}})</h2>
+                <h2>{{capitalize(faction.name)}} ({{count(faction.npcs)}})</h2>
                 <table ng-if="faction.npcs">
                     <thead>
                         <tr>

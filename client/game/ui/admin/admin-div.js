@@ -1,8 +1,9 @@
 angular.module('game.ui.admin.adminDiv', [
+        'underscore',
         'game.clientSettings',
         'global.constants',
         'angular-meteor',
-        'models.factions'
+        'models.factions',
     ])
     .directive('adminDiv', function() {
             'use strict';
@@ -14,7 +15,7 @@ angular.module('game.ui.admin.adminDiv', [
                 scope: {
                     cheats: '='
                 },
-                controller: ["$scope", "$http", "$clientSettings", "FactionsCollection", "CharBuilder", "IB_CONSTANTS", '$meteor', function($scope, $http, $clientSettings, FactionsCollection, CharBuilder, IB_CONSTANTS, $meteor) {
+                controller: ["_", "$scope", "$http", "$clientSettings", "FactionsCollection", "CharBuilder", "IB_CONSTANTS", '$meteor', function(_, $scope, $http, $clientSettings, FactionsCollection, CharBuilder, IB_CONSTANTS, $meteor) {
 
                     var ctrl = this;
 
@@ -29,6 +30,14 @@ angular.module('game.ui.admin.adminDiv', [
                     $meteor.subscribe("factions");
 
                     $scope.factions = $meteor.collection(FactionsCollection);
+
+                    $scope.capitalize = function(name) {
+                        return name.charAt(0).toUpperCase() + name.substring(1).toLowerCase();
+                    }; // Retrieved from UnderscoreJS website (12/18/2018).
+
+                    $scope.count = function(lst) {
+                        return _.size(lst);
+                    }
 
                     var updateCharacterPreview = function () {
                         var data = {};

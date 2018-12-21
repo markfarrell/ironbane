@@ -352,9 +352,6 @@ angular
 
 
             }).then(function(prefabs) { // Prefabs -> Factions (ex. for client UI)
-                var capitalize = function(str) {
-                    return str.charAt(0).toUpperCase() + str.substring(1).toLowerCase();
-                }; // Retrieved from UnderscoreJS website (12/18/2018).
                 var factions = _.chain(prefabs)
                     .pairs()
                     .map(function(pair) { 
@@ -369,12 +366,10 @@ angular
                     })
                     .pairs()
                     .map(function(pair) {
-                        var faction_name = capitalize(pair[0]);
+                        var faction_name = pair[0];
                         var faction_npcs = _.map(pair[1], _.first);
-                        var faction_count = _.size(faction_npcs);
                         return {
                             name : faction_name,
-                            count: faction_count,
                             npcs: faction_npcs
                         };
                     })
@@ -391,6 +386,7 @@ angular
                 Meteor.publish('factions', function() {
                     return FactionsCollection.find({});
                 });
+                console.log('Loaded ' + _.size(factions) + ' NPC factions into Meteor collection');
             }));
         };
 

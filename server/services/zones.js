@@ -1,5 +1,6 @@
 angular
     .module('server.services.zones', [
+        'underscore',
         'models',
         'services.contentLoader',
         'global.constants.game',
@@ -8,12 +9,14 @@ angular
         'systems.lifespan'
     ])
     .run([
+        '_',
+        '$q',
         'ZonesCollection',
         'ContentLoader',
         'ThreeWorld',
         '$injector',
         '$activeWorlds',
-        function(ZonesCollection, ContentLoader, ThreeWorld, $injector, $activeWorlds) {
+        function(_, $q, ZonesCollection, ContentLoader, ThreeWorld, $injector, $activeWorlds) {
             'use strict';
 
             var systemsForWorlds = [ // order matters
@@ -40,21 +43,38 @@ angular
             var meteorBuildPublicPath = meteorBuildPath + '../web.browser/app/';
             var scenePath = meteorBuildPublicPath + 'scene';
 
+            var worldToZone = function(world) { 
+                var spawn_zone = 'spawnZone';
+                var zone_name = world.name;
+                var zone_npcs = _.chain(world.getEntities(spawn_zone))
+                    .map(function(entity) { 
+                        return entity.getComponent(spawn_zone);
+                    })
+                    .map(function(component) {
+                        return component.entitiesToSpawnSeparatedByCommas.split(',');
+                    })
+                    .flatten()
+                    .uniq()
+                    .value();
+                return { name: zone_name, npcs: zone_npcs};
+            };
 
             ContentLoader.load().then(Meteor.bindEnvironment(function () {
 
-                walk(scenePath, {
-                    'no_recurse': true,
-                }, Meteor.bindEnvironment(function(filePath) {
-                    var sceneId = path.basename(filePath);
+                var sceneIds = _.chain(walk.sync(scenePath, { 'no_recurse' : true }))
+                    .map(path.basename)
+                    .reject(function(sceneId) {
+                        return Meteor.settings.public.useDevZone && sceneId.indexOf('dev-') === -1;
+                    })
+                    .value();
 
-                    if (Meteor.settings.public.useDevZone && sceneId.indexOf('dev-') === -1) {
-                        return;
-                    }
+                var worldPromises = _.map(sceneIds, function(sceneId) {
+                    var deferred = $q.defer();
 
                     var world = $activeWorlds[sceneId] = new ThreeWorld();
 
                     // TODO: prolly track this elsewhere
+
                     world._ownerCache = {};
 
                     angular.forEach(systemsForWorlds, function(system) {
@@ -67,12 +87,29 @@ angular
                         }
                     });
 
-                    // load the initial zone data from the world file
                     Meteor.setTimeout(function() {
                         world.load(sceneId).then(function () {
-                            console.log('Loaded zone:', world.name);
+                            console.log('Loaded world:', world.name);
+                            deferred.resolve(world);
                         });
                     }, 10);
+
+                    return deferred.promise;
+                });
+
+                var zonesPromise = $q.all(worldPromises).then(function(worlds) {
+                    return _.map(worlds, worldToZone);
+                });
+
+                zonesPromise.then(Meteor.bindEnvironment(function(zones) {
+                    ZonesCollection.remove({});
+                    _.each(zones, function(zone) {
+                        zone.id = ZonesCollection.insert(zone);
+                    });
+                    Meteor.publish('zones', function() {
+                        return ZonesCollection.find({});
+                    });
+                    console.log('Loaded ' + _.size(zones) + ' zones into Meteor collection');
                 }));
 
             }), function (err) {

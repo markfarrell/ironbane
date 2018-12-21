@@ -5,6 +5,7 @@ angular.module('game.ui.admin.adminDiv', [
         'angular-meteor',
         'models.zones',
         'models.factions',
+        'models.items'
     ])
     .directive('adminDiv', function() {
             'use strict';
@@ -16,7 +17,7 @@ angular.module('game.ui.admin.adminDiv', [
                 scope: {
                     cheats: '='
                 },
-                controller: ["_", "$scope", "$http", "$clientSettings", "ZonesCollection", "FactionsCollection", "CharBuilder", "IB_CONSTANTS", '$meteor', function(_, $scope, $http, $clientSettings, ZonesCollection, FactionsCollection, CharBuilder, IB_CONSTANTS, $meteor) {
+                controller: ["_", "$scope", "$http", "$clientSettings", "ZonesCollection", "FactionsCollection", "ItemsCollection", "CharBuilder", "IB_CONSTANTS", '$meteor', function(_, $scope, $http, $clientSettings, ZonesCollection, FactionsCollection, ItemsCollection, CharBuilder, IB_CONSTANTS, $meteor) {
 
                     var ctrl = this;
 
@@ -41,6 +42,31 @@ angular.module('game.ui.admin.adminDiv', [
                     $scope.count = function(lst) {
                         return _.size(lst);
                     }
+
+                    var groupItems = function(items, groupFunction) {
+                        return _.chain(items)
+                            .groupBy(groupFunction)
+                            .pairs()
+                            .map(function(pair) {
+                                var group_name = pair[0];
+                                var group_items = pair[1];
+                                return {name : group_name, items : group_items};
+                            })
+                            .value();
+                    };
+
+                    var refreshItemGroups = function() { 
+                        var items = ItemsCollection.find({}).fetch();
+
+                        $scope.rarities = groupItems(items, function(item) { return item.rarity });
+                        $scope.itemTypes = groupItems(items, function(item) { return item.type });
+
+                        console.log($scope.rarities);
+                        console.log($scope.itemTypes);
+
+                    };
+
+                    refreshItemGroups();
 
                     var updateCharacterPreview = function () {
                         var data = {};

@@ -1,9 +1,12 @@
 <div ng-init="mode = ''">
     <div ng-if="!mode">
         <h1>Admin panel</h1>
-        <button class="ibutton" click-sound ng-click="$parent.mode = 'itemids'" style="width:145px;">Item IDs</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'skinids'" style="width:145px;">Skin/Armor IDs</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'cheats'" style="width:145px;">Cheats</button>
+        <h2>Items</h2>
+        <button class="ibutton" click-sound ng-click="$parent.mode = 'itemids'" style="width:145px;">Item IDs</button>
+        <button class="ibutton" click-sound ng-click="$parent.mode = 'itemtypes'" style="width:145px;">Item Types</button>
+        <button class="ibutton" click-sound ng-click="$parent.mode = 'rarities'" style="width:145px;">Rarities</button>
         <h2>NPCs</h2>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'npcbuilder'" style="width:145px;">NPC Builder</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'zones'" style="width:145px;">Zones</button>
@@ -29,6 +32,85 @@
                 <img ng-src="images/characters/{{ name }}/{{ img }}.png" ng-style="{ 'width': name == 'head' || name == 'hair' ? '32px' : '96px'}">
             </div>
         </div>
+    </div>
+    <div ng-if="mode == 'itemtypes'" ng-init="itemtypes_mode='All'">
+        <h1>Item Types: {{capitalize(itemtypes_mode)}}</h1>
+        <button class="ibutton" click-sound ng-click="itemtypes_mode = 'All'" style="width:145px;">All</button>
+        <h2></h2>
+        <button ng-repeat="itemType in itemTypes" class="ibutton" click-sound ng-click="$parent.itemtypes_mode = ''+itemType.name" style="width:145px;">{{capitalize(itemType.name)}}</button>
+        <div ng-if="itemtypes_mode == 'All'">
+            <h2>Summary</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th align="left">Item Type</th>
+                            <th align="right">#</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="itemType in itemTypes" ng-if="itemType">
+                            <td align="left">{{capitalize(itemType.name)}}</td>
+                            <td align="right">{{count(itemType.items)}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+        <div ng-repeat="itemType in itemTypes">
+            <div ng-if="itemtypes_mode == itemType.name">
+                <h2>{{capitalize(itemType.name)}} ({{count(itemType.items)}})</h2>
+                <table ng-if="itemType.items">
+                    <thead>
+                        <tr>
+                            <th align="left">Item</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in itemType.items" ng-if="item">
+                            <td align="left">{{item.name}}</td>
+                        </tr>
+                    </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+    <div ng-if="mode =='rarities'" ng-init="rarities_mode='All'">
+        <h1>Rarities: {{capitalize(rarities_mode)}}</h1>
+        <button class="ibutton" click-sound ng-click="rarities_mode = 'All'" style="width:145px;">All</button>
+        <button ng-repeat="rarity in rarities" class="ibutton" click-sound ng-click="$parent.rarities_mode = ''+rarity.name" style="width:145px;">{{capitalize(rarity.name)}}</button>
+        <div ng-if="rarities_mode == 'All'">
+            <h2>Summary</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th align="left">Rarity</th>
+                            <th align="right">#</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="rarity in rarities" ng-if="rarity">
+                            <td align="left">{{capitalize(rarity.name)}}</td>
+                            <td align="right">{{count(rarity.items)}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+        <div ng-repeat="rarity in rarities">
+            <div ng-if="rarities_mode == rarity.name">
+                <h2>{{capitalize(rarity.name)}} ({{count(rarity.items)}})</h2>
+                <table ng-if="rarity.items">
+                    <thead>
+                        <tr>
+                            <th align="left">Item</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in rarity.items" ng-if="item">
+                            <td align="left">{{item.name}}</td>
+                        </tr>
+                    </tbody>
+            </table>
+            </div>
+        </div> 
     </div>
     <div ng-if="mode =='zones'" ng-init="zones_mode='All'">
         <h1>NPC Zones: {{capitalize(zones_mode)}}</h1>

@@ -109,7 +109,7 @@ angular
                     Meteor.publish('zones', function() {
                         return ZonesCollection.find({});
                     });
-                    console.log('Loaded ' + _.size(zones) + ' zones into Meteor collection');
+                    console.log('Loaded ' + _.size(zones) + ' NPC zones into Meteor collection');
                 }));
 
             }), function (err) {

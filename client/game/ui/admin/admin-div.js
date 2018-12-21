@@ -3,6 +3,7 @@ angular.module('game.ui.admin.adminDiv', [
         'game.clientSettings',
         'global.constants',
         'angular-meteor',
+        'models.zones',
         'models.factions',
     ])
     .directive('adminDiv', function() {
@@ -15,7 +16,7 @@ angular.module('game.ui.admin.adminDiv', [
                 scope: {
                     cheats: '='
                 },
-                controller: ["_", "$scope", "$http", "$clientSettings", "FactionsCollection", "CharBuilder", "IB_CONSTANTS", '$meteor', function(_, $scope, $http, $clientSettings, FactionsCollection, CharBuilder, IB_CONSTANTS, $meteor) {
+                controller: ["_", "$scope", "$http", "$clientSettings", "ZonesCollection", "FactionsCollection", "CharBuilder", "IB_CONSTANTS", '$meteor', function(_, $scope, $http, $clientSettings, ZonesCollection, FactionsCollection, CharBuilder, IB_CONSTANTS, $meteor) {
 
                     var ctrl = this;
 
@@ -27,8 +28,10 @@ angular.module('game.ui.admin.adminDiv', [
                     // out how these can be autoread and sent to the client
                     $scope.charImages = IB_CONSTANTS.charImages;
 
+                    $meteor.subscribe("zones");
                     $meteor.subscribe("factions");
 
+                    $scope.zones = $meteor.collection(ZonesCollection);
                     $scope.factions = $meteor.collection(FactionsCollection);
 
                     $scope.capitalize = function(name) {

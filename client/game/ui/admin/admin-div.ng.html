@@ -6,6 +6,7 @@
         <button class="ibutton" click-sound ng-click="$parent.mode = 'cheats'" style="width:145px;">Cheats</button>
         <h2>NPCs</h2>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'npcbuilder'" style="width:145px;">NPC Builder</button>
+        <button class="ibutton" click-sound ng-click="$parent.mode = 'zones'" style="width:145px;">Zones</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'factions'" style="width:145px;">Factions</button>
     </div>
     <div ng-if="mode">
@@ -26,6 +27,45 @@
             <div ng-repeat="img in list" style="display:inline-block;padding-bottom:30px;" ng-if="img">
                 <div style="position:absolute">{{ img }}</div>
                 <img ng-src="images/characters/{{ name }}/{{ img }}.png" ng-style="{ 'width': name == 'head' || name == 'hair' ? '32px' : '96px'}">
+            </div>
+        </div>
+    </div>
+    <div ng-if="mode =='zones'" ng-init="zones_mode='All'">
+        <h1>NPC Zones: {{capitalize(zones_mode)}}</h1>
+        <button class="ibutton" click-sound ng-click="zones_mode = 'All'" style="width:145px;">All</button>
+        <button ng-repeat="zone in zones" class="ibutton" click-sound ng-click="$parent.zones_mode = ''+zone.name" style="width:145px;">{{capitalize(zone.name)}}</button>
+        <div ng-if="zones_mode == 'All'">
+            <h2>Summary</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th align="left">Zone</th>
+                            <th align="right">#</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="zone in zones" ng-if="zone">
+                            <td align="left">{{capitalize(zone.name)}}</td>
+                            <td align="right">{{count(zone.npcs)}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+        <div ng-repeat="zone in zones">
+            <div ng-if="zones_mode == zone.name">
+                <h2>{{capitalize(zone.name)}} ({{count(zone.npcs)}})</h2>
+                <table ng-if="zone.npcs">
+                    <thead>
+                        <tr>
+                            <th align="left">NPC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="npc in zone.npcs" ng-if="npc">
+                            <td align="left">{{npc}}</td>
+                        </tr>
+                    </tbody>
+            </table>
             </div>
         </div>
     </div>

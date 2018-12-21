@@ -418,6 +418,16 @@ angular
                                     if (armorComponent) {
                                         var armorDamageDone = Math.min(armorComponent.value, damage);
 
+                                        if(entity.hasComponent('player')) {
+                                            var cheatComponent = entity.getComponent('cheats');
+
+                                            if(cheatComponent) {
+                                                if(cheatComponent.armor_invincibility) {
+                                                    armorDamageDone = 0;
+                                                }
+                                            }
+                                        }
+
                                         damage -= armorDamageDone;
 
                                         if (Meteor.isClient) {
@@ -433,6 +443,16 @@ angular
 
                                     if (healthComponent) {
                                         var healthDamageDone = Math.min(healthComponent.value, damage);
+
+                                        if(entity.hasComponent('player')) {
+                                            var cheatComponent = entity.getComponent('cheats');
+
+                                            if(cheatComponent) {
+                                                if(cheatComponent.health_invincibility) {
+                                                    healthDamageDone = 0;
+                                                }
+                                            }
+                                        }
 
                                         damage -= healthDamageDone;
 

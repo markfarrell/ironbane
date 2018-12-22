@@ -1,5 +1,6 @@
 angular
     .module('game.systems.network', [
+        'underscore',
         'ces',
         'three',
         'engine.entity-builder',
@@ -11,6 +12,7 @@ angular
         'game.ui.chat.chatService'
     ])
     .factory('NetworkSystem', [
+        '_',
         'System',
         'EntityBuilder',
         '$log',
@@ -24,7 +26,7 @@ angular
         '$timeout',
         'IbUtils',
         'ChatService',
-        function(System, EntityBuilder, $log, $rootScope, $components, $rootWorld, $entityCache, THREE, Ammo, Timer, $timeout, IbUtils, ChatService) {
+        function(_, System, EntityBuilder, $log, $rootScope, $components, $rootWorld, $entityCache, THREE, Ammo, Timer, $timeout, IbUtils, ChatService) {
             'use strict';
 
             function arraysAreEqual(a1, a2) {
@@ -172,7 +174,7 @@ angular
                             // TODO: UUID for items
                             me._stream.emit('inventory:dropItem', {
                                 entityUuid: entity.uuid,
-                                itemUuid: item.uuid
+                                item: _.pick(item, 'uuid', 'name')
                             });
                         }
                     });

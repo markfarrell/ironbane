@@ -1,13 +1,15 @@
 angular.module('game.ui.admin.adminDiv', [
         'underscore',
         'game.clientSettings',
+        'game.world-root',
         'global.constants',
         'angular-meteor',
+        'engine.util',
         'models.zones',
         'models.factions',
         'models.items'
     ])
-    .directive('adminDiv', function() {
+    .directive('adminDiv', ['$rootWorld', function($rootWorld) {
             'use strict';
 
             return {
@@ -17,23 +19,13 @@ angular.module('game.ui.admin.adminDiv', [
                 scope: {
                     cheats: '='
                 },
-                controller: ["_", "$scope", "$http", "$clientSettings", "ZonesCollection", "FactionsCollection", "ItemsCollection", "CharBuilder", "IB_CONSTANTS", '$meteor', function(_, $scope, $http, $clientSettings, ZonesCollection, FactionsCollection, ItemsCollection, CharBuilder, IB_CONSTANTS, $meteor) {
+                controller: ["_", "$scope", "$http", "$clientSettings", "$rootScope", "ZonesCollection", "FactionsCollection", "ItemsCollection", "CharBuilder", "IB_CONSTANTS", "IbUtils",'$meteor', function(_, $scope, $http, $clientSettings, $rootScope, ZonesCollection, FactionsCollection, ItemsCollection, CharBuilder, IB_CONSTANTS, IbUtils, $meteor) {
 
                     var ctrl = this;
 
                     $scope.getImageID = function (e) {
                         $scope.imageId = (Math.floor(e.offsetX / 32)) + ((0+Math.floor(e.offsetY / 32))*16)
                     };
-
-                    // These have to kept sync with the actual armor images in the images/characters/ folders until I figure
-                    // out how these can be autoread and sent to the client
-                    $scope.charImages = IB_CONSTANTS.charImages;
-
-                    $meteor.subscribe("zones");
-                    $meteor.subscribe("factions");
-
-                    $scope.zones = $meteor.collection(ZonesCollection);
-                    $scope.factions = $meteor.collection(FactionsCollection);
 
                     $scope.capitalize = function(name) {
                         return name.charAt(0).toUpperCase() + name.substring(1).toLowerCase();
@@ -55,18 +47,37 @@ angular.module('game.ui.admin.adminDiv', [
                             .value();
                     };
 
-                    var refreshItemGroups = function() { 
+                    var itemGroups = function() { 
                         var items = ItemsCollection.find({}).fetch();
-
-                        $scope.rarities = groupItems(items, function(item) { return item.rarity });
-                        $scope.itemTypes = groupItems(items, function(item) { return item.type });
-
-                        console.log($scope.rarities);
-                        console.log($scope.itemTypes);
-
+                        return {
+                            rarities : groupItems(items, function(item) { return item.rarity }),
+                            types : groupItems(items, function(item) { return item.type })
+                        };
                     };
 
-                    refreshItemGroups();
+                    // These have to kept sync with the actual armor images in the images/characters/ folders until I figure
+                    // out how these can be autoread and sent to the client
+                    $scope.charImages = IB_CONSTANTS.charImages;
+
+                    $meteor.subscribe("zones");
+                    $meteor.subscribe("factions");
+
+                    $scope.zones = $meteor.collection(ZonesCollection);
+                    $scope.factions = $meteor.collection(FactionsCollection);
+
+                    var groups = itemGroups();
+                    $scope.rarities = groups.rarities;
+                    $scope.itemTypes = groups.types;
+
+                    $scope.dropRandom = function(opts) {
+                        var items = ItemsCollection.find(opts).fetch();
+                        var item = _.sample(items);
+                        var entity = $rootScope.mainPlayer;
+                        if(entity) {
+                            console.log(item);
+                            $rootWorld.publish("inventory:dropItem", entity, item);
+                        }
+                    };
 
                     var updateCharacterPreview = function () {
                         var data = {};
@@ -139,4 +150,4 @@ angular.module('game.ui.admin.adminDiv', [
 
                 }]
             };
-        });
+        }]);

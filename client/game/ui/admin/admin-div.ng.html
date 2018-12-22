@@ -69,7 +69,8 @@
                             <td align="left">{{item.name}}</td>
                         </tr>
                     </tbody>
-            </table>
+                </table>
+                <button class="ibutton" click-sound ng-click="dropRandom({'type' : itemType.name})" style="width:145px;">Drop</button>
             </div>
         </div>
     </div>
@@ -109,6 +110,7 @@
                         </tr>
                     </tbody>
             </table>
+            <button class="ibutton" click-sound ng-click="dropRandom({'rarity' : rarity.name})" style="width:145px;">Drop</button>
             </div>
         </div> 
     </div>

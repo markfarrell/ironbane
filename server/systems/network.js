@@ -6,7 +6,8 @@ angular
         'global.constants.inv',
         'global.constants.game',
         'engine.timing',
-        'engine.util'
+        'engine.util',
+        'models.items'
     ])
     .factory('NetworkSystem', [
         'System',
@@ -17,7 +18,8 @@ angular
         'IB_CONSTANTS',
         'Timer',
         'IbUtils',
-        function(System, $log, ChatService, THREE, INV_SLOTS, IB_CONSTANTS, Timer, IbUtils) {
+        'ItemsCollection',
+        function(System, $log, ChatService, THREE, INV_SLOTS, IB_CONSTANTS, Timer, IbUtils, ItemsCollection) {
             'use strict';
 
             function arraysAreEqual(a1, a2) {
@@ -531,6 +533,7 @@ angular
                             var netEntities = world.getEntities('netSend');
                             var netEntity = _.findWhere(netEntities, {uuid: data.entityUuid});
 
+
                             if (!netEntity) {
                                 $log.error('[inventory:dropItem] netEntity not found!');
                                 return;
@@ -547,7 +550,21 @@ angular
                                 return;
                             }
 
-                            var item = inventorySystem.findItemByUuid(netEntity, data.itemUuid);
+                            var item = (function() {
+                                var itemUuid = data.item.uuid;
+                                if(itemUuid) {
+                                    return inventorySystem.findItemByUuid(netEntity, itemUuid);
+                                }
+                                var itemTemplate = ItemsCollection.findOne(data.item);
+                                if(itemTemplate) {
+                                    return _.chain(itemTemplate)
+                                        .omit('_id')
+                                        .extend({uuid : IbUtils.generateUuid() })
+                                        .value();
+                                }
+                                return undefined;
+                            })();
+
                             if (!item) {
                                 $log.error('[inventory:dropItem] item not found!');
                                 return;
@@ -594,7 +611,6 @@ angular
                                 // $log.log('picking up item ' + pickupComponent.item.name);
                             }
                         });
-
 
                     });
 

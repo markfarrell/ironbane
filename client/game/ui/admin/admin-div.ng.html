@@ -7,6 +7,7 @@
         <button class="ibutton" click-sound ng-click="$parent.mode = 'itemids'" style="width:145px;">Item IDs</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'itemtypes'" style="width:145px;">Item Types</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'rarities'" style="width:145px;">Rarities</button>
+        <button class="ibutton" click-sound ng-click="$parent.mode = 'dropitems'" style="width:145px;">Drop Items</button>
         <h2>NPCs</h2>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'npcbuilder'" style="width:145px;">NPC Builder</button>
         <button class="ibutton" click-sound ng-click="$parent.mode = 'zones'" style="width:145px;">Zones</button>
@@ -70,7 +71,6 @@
                         </tr>
                     </tbody>
                 </table>
-                <button class="ibutton" click-sound ng-click="dropRandom({'type' : itemType.name})" style="width:145px;">Drop</button>
             </div>
         </div>
     </div>
@@ -110,9 +110,13 @@
                         </tr>
                     </tbody>
             </table>
-            <button class="ibutton" click-sound ng-click="dropRandom({'rarity' : rarity.name})" style="width:145px;">Drop</button>
             </div>
-        </div> 
+        </div>
+    </div>
+    <div ng-if="mode == 'dropitems'">
+        <h1>Drop Items {{dropItems.input}}</h1>
+        <input type="text" class="iinput" ib-focus="true" ng-model="dropItems.input">
+        <button class="ibutton" click-sound ng-click="dropRandom(JSON.parse(dropItems.input))" style="width:145px;">Drop</button>
     </div>
     <div ng-if="mode =='zones'" ng-init="zones_mode='All'">
         <h1>NPC Zones: {{capitalize(zones_mode)}}</h1>

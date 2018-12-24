@@ -68,13 +68,17 @@ angular.module('game.ui.admin.adminDiv', [
                     var groups = itemGroups();
                     $scope.rarities = groups.rarities;
                     $scope.itemTypes = groups.types;
+                    $scope.dropItems = { input : "{}" };
+
+                    $scope.JSON = {parse : JSON.parse};
 
                     $scope.dropRandom = function(opts) {
+                        console.log("Opts:", opts);
                         var items = ItemsCollection.find(opts).fetch();
                         var item = _.sample(items);
                         var entity = $rootScope.mainPlayer;
                         if(entity) {
-                            console.log(item);
+                            console.log("Item:", item);
                             $rootWorld.publish("inventory:dropItem", entity, item);
                         }
                     };

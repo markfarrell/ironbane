@@ -7,7 +7,8 @@ angular.module('game.ui.admin.adminDiv', [
         'engine.util',
         'models.zones',
         'models.factions',
-        'models.items'
+        'models.items',
+        'services.items',
     ])
     .directive('adminDiv', ['$rootWorld', function($rootWorld) {
             'use strict';
@@ -19,7 +20,7 @@ angular.module('game.ui.admin.adminDiv', [
                 scope: {
                     cheats: '='
                 },
-                controller: ["_", "$scope", "$http", "$clientSettings", "$rootScope", "ZonesCollection", "FactionsCollection", "ItemsCollection", "CharBuilder", "IB_CONSTANTS", "IbUtils",'$meteor', function(_, $scope, $http, $clientSettings, $rootScope, ZonesCollection, FactionsCollection, ItemsCollection, CharBuilder, IB_CONSTANTS, IbUtils, $meteor) {
+                controller: ["_", "$scope", "$http", "$clientSettings", "$rootScope", "ZonesCollection", "FactionsCollection", "ItemsCollection", "ItemService", "CharBuilder", "IB_CONSTANTS", "IbUtils",'$meteor', function(_, $scope, $http, $clientSettings, $rootScope, ZonesCollection, FactionsCollection, ItemsCollection, ItemService, CharBuilder, IB_CONSTANTS, IbUtils, $meteor) {
 
                     var ctrl = this;
 
@@ -35,26 +36,6 @@ angular.module('game.ui.admin.adminDiv', [
                         return _.size(lst);
                     }
 
-                    var groupItems = function(items, groupFunction) {
-                        return _.chain(items)
-                            .groupBy(groupFunction)
-                            .pairs()
-                            .map(function(pair) {
-                                var group_name = pair[0];
-                                var group_items = pair[1];
-                                return {name : group_name, items : group_items};
-                            })
-                            .value();
-                    };
-
-                    var itemGroups = function() { 
-                        var items = ItemsCollection.find({}).fetch();
-                        return {
-                            rarities : groupItems(items, function(item) { return item.rarity }),
-                            types : groupItems(items, function(item) { return item.type })
-                        };
-                    };
-
                     // These have to kept sync with the actual armor images in the images/characters/ folders until I figure
                     // out how these can be autoread and sent to the client
                     $scope.charImages = IB_CONSTANTS.charImages;
@@ -65,9 +46,12 @@ angular.module('game.ui.admin.adminDiv', [
                     $scope.zones = $meteor.collection(ZonesCollection);
                     $scope.factions = $meteor.collection(FactionsCollection);
 
-                    var groups = itemGroups();
-                    $scope.rarities = groups.rarities;
-                    $scope.itemTypes = groups.types;
+                    var itemTemplates = {
+                        rarities : ItemService.getItemTemplates("rarity"),
+                        types : ItemService.getItemTemplates("type")
+                    };
+                    $scope.rarities = itemTemplates.rarities;
+                    $scope.itemTypes = itemTemplates.types;
                     $scope.dropItems = { input : "{}" };
 
                     $scope.JSON = {parse : JSON.parse};

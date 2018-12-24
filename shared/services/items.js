@@ -1,13 +1,15 @@
 angular
     .module('services.items', [
+        'underscore',
         'models.items',
         'game.itemBehaviors'
     ])
     .service('ItemService', [
+        '_',
         'ItemsCollection',
         '$cacheFactory',
         '$injector',
-        function(ItemsCollection, $cacheFactory, $injector) {
+        function(_, ItemsCollection, $cacheFactory, $injector) {
             'use strict';
 
             let _cache = $cacheFactory('ItemBehaviorCache');
@@ -16,6 +18,19 @@ angular
                 return ItemsCollection.findOne({
                     name: itemName
                 }) || null;
+            };
+
+            this.getItemTemplates = function getItemTemplates(fieldName) {
+                var items = ItemsCollection.find({}).fetch();
+                return _.chain(items)
+                    .groupBy(function(item) { return item[fieldName]; })
+                    .pairs()
+                    .map(function(pair) {
+                        var groupName = pair[0];
+                        var itemTemplates = pair[1];
+                        return {name : groupName, items : itemTemplates};
+                    })
+                    .value();
             };
 
             this.executeBehaviorScript = function executeBehaviorScript(scriptName, item, entity) {

@@ -1,16 +1,18 @@
 angular.module('game.ui.chat.chatService', [
         'angular-meteor',
         'models.chatMessages',
+        'models.items',
         'game.ui.bigMessages.bigMessagesService',
         'game.ui.dialog'
     ])
     .service('ChatService', [
         '$meteor',
         'ChatMessagesCollection',
+        'ItemsCollection',
         'BigMessagesService',
         'dialogService',
         '$rootWorld',
-        function($meteor, ChatMessagesCollection, BigMessagesService, dialogService, $rootWorld) {
+        function($meteor, ChatMessagesCollection, ItemsCollection, BigMessagesService, dialogService, $rootWorld) {
             'use strict';
 
             var service = this;
@@ -104,6 +106,13 @@ angular.module('game.ui.chat.chatService', [
                             warningMsg = warnBits.join(' ');
 
                         $meteor.call('warnUser', theWarned, warningLevel, warningMsg);
+                    } else if (cmd === 'drop' && args.length) {
+                        var opts = _.pick(JSON.parse(args), 'name', 'type', 'rarity');
+                        var items = ItemsCollection.find(opts).fetch();
+                        var item = _.sample(items);
+                        if(item) {
+                            $meteor.call('spawnItem', item.name);
+                        }
                     } else {
                         service.postClientMsg('Invalid command.', {
                             error: true

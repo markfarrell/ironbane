@@ -18,7 +18,7 @@ angular
 
                 // return result;
             },
-            giveItem: function (itemName) {
+            spawnItem: function (itemName) {
                 if (!this.userId || !Roles.userIsInRole(this.userId, ['game-master'])) {
                     throw new Meteor.Error('not-authorized');
                 }
@@ -52,7 +52,7 @@ angular
 
                 if (entity && eWorld) {
                     var inv = eWorld.getSystem('inventory');
-                    inv.addItem(entity, item);
+                    inv.dropItem(entity, item);
                 }
             }
         });

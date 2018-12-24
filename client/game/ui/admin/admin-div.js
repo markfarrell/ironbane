@@ -52,7 +52,7 @@ angular.module('game.ui.admin.adminDiv', [
                     };
                     $scope.rarities = itemTemplates.rarities;
                     $scope.itemTypes = itemTemplates.types;
-                    $scope.dropItems = { input : "{}" };
+                    $scope.dropItems = { input : "" };
 
                     $scope.JSON = {parse : JSON.parse};
 
@@ -63,7 +63,7 @@ angular.module('game.ui.admin.adminDiv', [
                         var entity = $rootScope.mainPlayer;
                         if(entity) {
                             console.log("Item:", item);
-                            $rootWorld.publish("inventory:dropItem", entity, item);
+                            $meteor.call("spawnItem", item.name);
                         }
                     };
 

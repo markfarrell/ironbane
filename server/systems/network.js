@@ -550,21 +550,7 @@ angular
                                 return;
                             }
 
-                            var item = (function() {
-                                var itemUuid = data.item.uuid;
-                                if(itemUuid) {
-                                    return inventorySystem.findItemByUuid(netEntity, itemUuid);
-                                }
-                                var itemTemplate = ItemsCollection.findOne(data.item);
-                                if(itemTemplate) {
-                                    return _.chain(itemTemplate)
-                                        .omit('_id')
-                                        .extend({uuid : IbUtils.generateUuid() })
-                                        .value();
-                                }
-                                return undefined;
-                            })();
-
+                            var item = inventorySystem.findItemByUuid(netEntity, data.itemUuid);
                             if (!item) {
                                 $log.error('[inventory:dropItem] item not found!');
                                 return;

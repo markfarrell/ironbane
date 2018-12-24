@@ -174,7 +174,7 @@ angular
                             // TODO: UUID for items
                             me._stream.emit('inventory:dropItem', {
                                 entityUuid: entity.uuid,
-                                item: _.pick(item, 'uuid', 'name')
+                                itemUuid: item.uuid
                             });
                         }
                     });

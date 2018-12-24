@@ -1,7 +1,6 @@
 angular.module('game.ui.admin.adminDiv', [
         'underscore',
         'game.clientSettings',
-        'game.world-root',
         'global.constants',
         'angular-meteor',
         'engine.util',
@@ -10,7 +9,7 @@ angular.module('game.ui.admin.adminDiv', [
         'models.items',
         'services.items',
     ])
-    .directive('adminDiv', ['$rootWorld', function($rootWorld) {
+    .directive('adminDiv', [function() {
             'use strict';
 
             return {
@@ -20,7 +19,7 @@ angular.module('game.ui.admin.adminDiv', [
                 scope: {
                     cheats: '='
                 },
-                controller: ["_", "$scope", "$http", "$clientSettings", "$rootScope", "ZonesCollection", "FactionsCollection", "ItemsCollection", "ItemService", "CharBuilder", "IB_CONSTANTS", "IbUtils",'$meteor', function(_, $scope, $http, $clientSettings, $rootScope, ZonesCollection, FactionsCollection, ItemsCollection, ItemService, CharBuilder, IB_CONSTANTS, IbUtils, $meteor) {
+                controller: ["_", "$scope", "$http", "$clientSettings", "ZonesCollection", "FactionsCollection", "ItemService", "CharBuilder", "IB_CONSTANTS", "IbUtils",'$meteor', function(_, $scope, $http, $clientSettings, ZonesCollection, FactionsCollection, ItemService, CharBuilder, IB_CONSTANTS, IbUtils, $meteor) {
 
                     var ctrl = this;
 
@@ -52,20 +51,6 @@ angular.module('game.ui.admin.adminDiv', [
                     };
                     $scope.rarities = itemTemplates.rarities;
                     $scope.itemTypes = itemTemplates.types;
-                    $scope.dropItems = { input : "" };
-
-                    $scope.JSON = {parse : JSON.parse};
-
-                    $scope.dropRandom = function(opts) {
-                        console.log("Opts:", opts);
-                        var items = ItemsCollection.find(opts).fetch();
-                        var item = _.sample(items);
-                        var entity = $rootScope.mainPlayer;
-                        if(entity) {
-                            console.log("Item:", item);
-                            $meteor.call("spawnItem", item.name);
-                        }
-                    };
 
                     var updateCharacterPreview = function () {
                         var data = {};

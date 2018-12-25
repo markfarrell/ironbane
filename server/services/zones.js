@@ -1,22 +1,91 @@
 angular
     .module('server.services.zones', [
         'underscore',
+        'three',
         'models',
         'services.contentLoader',
         'global.constants.game',
         'server.services',
         'game.threeWorld',
-        'systems.lifespan'
+        'systems.lifespan',
+        'engine.util'
     ])
+    .service('ZonesService', ['_', 'THREE', 'IbUtils', function(_, THREE, IbUtils) {
+        'use strict';
+
+        var getEntitySpawnList = function(spawnZoneEntity) {
+            var component = spawnZoneEntity.getComponent('spawnZone');
+            return component.entitiesToSpawnSeparatedByCommas.split(',');
+        };
+
+        var getMeshes = function(spawnZoneEntity) {
+            var meshes = _.chain(spawnZoneEntity.children)
+                .map(function(entity) {
+                    return entity.getComponent('mesh');
+                })
+                .reject(_.isUndefined)
+                .filter(function(component) { 
+                    return component._meshLoaded;
+                })
+                .map(function(component) { 
+                    return component._mesh;
+                })
+                .reject(_.isUndefined)
+                .value();
+            return meshes;
+        };
+
+        var getBoundingBox = function(mesh) { 
+            if (!mesh.geometry.boundingBox) {
+                mesh.geometry.computeBoundingBox();
+            }
+            var box = mesh.geometry.boundingBox;
+            var min3 = new THREE.Vector3(box.min.x,box.min.y,box.min.z);
+            var max3 = new THREE.Vector3(box.max.x,box.max.y,box.max.z);
+            min3.applyMatrix4(mesh.matrixWorld);
+            max3.applyMatrix4(mesh.matrixWorld);
+            return { 
+                min : { x : min3.x, y : min3.y, z : min3.z }, 
+                max : { x : max3.x, y : max3.y, z : max3.z }
+            };
+        };
+
+        var getBoundingBoxes = function(spawnZoneEntity) {
+            var meshes = getMeshes(spawnZoneEntity);
+            return _.map(meshes, getBoundingBox);
+        };
+
+        this.getSpawnZones = function(world) {
+            return _.chain(world.getEntities('spawnZone'))
+                .map(function(spawnZoneEntity) {
+                    return {
+                        bounds : getBoundingBoxes(spawnZoneEntity),
+                        npcs : getEntitySpawnList(spawnZoneEntity)
+                    };
+                })
+                .value();
+        };
+
+        this.getSpawnList = function(world) {
+            var npcs = _.chain(world.getEntities('spawnZone'))
+                .map(getEntitySpawnList)
+                .flatten()
+                .uniq()
+                .value();
+                return npcs;
+        };
+
+    }])
     .run([
         '_',
         '$q',
+        'ZonesService',
         'ZonesCollection',
         'ContentLoader',
         'ThreeWorld',
         '$injector',
         '$activeWorlds',
-        function(_, $q, ZonesCollection, ContentLoader, ThreeWorld, $injector, $activeWorlds) {
+        function(_, $q, ZonesService, ZonesCollection, ContentLoader, ThreeWorld, $injector, $activeWorlds) {
             'use strict';
 
             var systemsForWorlds = [ // order matters
@@ -42,22 +111,6 @@ angular
             var meteorBuildPath = path.resolve('.') + '/';
             var meteorBuildPublicPath = meteorBuildPath + '../web.browser/app/';
             var scenePath = meteorBuildPublicPath + 'scene';
-
-            var worldToZone = function(world) { 
-                var spawn_zone = 'spawnZone';
-                var zone_name = world.name;
-                var zone_npcs = _.chain(world.getEntities(spawn_zone))
-                    .map(function(entity) { 
-                        return entity.getComponent(spawn_zone);
-                    })
-                    .map(function(component) {
-                        return component.entitiesToSpawnSeparatedByCommas.split(',');
-                    })
-                    .flatten()
-                    .uniq()
-                    .value();
-                return { name: zone_name, npcs: zone_npcs};
-            };
 
             ContentLoader.load().then(Meteor.bindEnvironment(function () {
 
@@ -98,7 +151,9 @@ angular
                 });
 
                 var zonesPromise = $q.all(worldPromises).then(function(worlds) {
-                    return _.map(worlds, worldToZone);
+                    return _.map(worlds, function(world) {
+                        return {name : world.name, npcs : ZonesService.getSpawnList(world)};
+                    });
                 });
 
                 zonesPromise.then(Meteor.bindEnvironment(function(zones) {

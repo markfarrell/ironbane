@@ -113,6 +113,8 @@ angular.module('game.ui.chat.chatService', [
                         if(item) {
                             $meteor.call('spawnItem', item.name);
                         }
+                    } else if (cmd == 'zone' && args.length) {
+                        $meteor.call('resetPlayer', args);
                     } else {
                         service.postClientMsg('Invalid command.', {
                             error: true

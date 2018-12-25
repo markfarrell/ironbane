@@ -5,7 +5,8 @@ angular
         GAME_VERSION: '0.6.2 alpha',
         world: {
             mainMenuLevel: Meteor.settings.public.useDevZone ? 'dev-zone' : 'ravenwood',
-            startLevel: Meteor.settings.public.useDevZone ? 'dev-zone' : 'ravenwood'
+            startLevel: Meteor.settings.public.useDevZone ? 'dev-zone' : 'ravenwood',
+            resetDelay : 2000
         },
         characterParts: {
             male: {

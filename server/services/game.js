@@ -8,13 +8,14 @@ angular
         'three'
     ])
     .service('GameService', [
+        '$log',
         'EntitiesCollection',
         '$activeWorlds',
         'IB_CONSTANTS',
         'EntityBuilder',
         'ChatService',
         'THREE',
-        function(EntitiesCollection, $activeWorlds, IB_CONSTANTS, EntityBuilder, ChatService, THREE) {
+        function($log, EntitiesCollection, $activeWorlds, IB_CONSTANTS, EntityBuilder, ChatService, THREE) {
             'use strict';
 
             this.enterGame = function(charId) {
@@ -133,60 +134,81 @@ angular
                 userExit(this.userId);
             };
 
-            this.resetPlayer = function() {
-
-                // Later, instead of ravenwood, we can point players to their real home
-                // which they rent/bought using the virtul currency
-                // TODO add timeout?
-
-                var startLevel = IB_CONSTANTS.world.startLevel;
+            this.resetPlayer = function(targetZone) {
 
                 var me = this;
 
-                _.each($activeWorlds, function (world) {
-                    var playerEntities = world.getEntities('player');
-                    playerEntities.forEach(function (player) {
-                        if (player.owner === me.userId && !player.__isResetting) {
+                var players = _.chain($activeWorlds)
+                    .map(function(world) {
+                        return world.getEntities('player');
+                    })
+                    .flatten()
+                    .value();
 
-                            player.__isResetting = true;
+                var player = _.findWhere(players, {owner : me.userId});
 
-                            world.removeEntity(player);
+                var sourceWorld = $activeWorlds[player.level];
 
-                            setTimeout(function () {
-                                if ($activeWorlds[startLevel]) {
-                                    // if not we have a problem!
-                                    var spawns = $activeWorlds[startLevel].getEntities('spawnPoint');
-                                    if (spawns.length === 0) {
-                                        console.log(startLevel, ' has no spawn points defined!');
-                                        player.position.copy(new THREE.Vector3());
-                                        player.rotation.copy(new THREE.Euler());
-                                    }
-                                    else {
-                                        // Just pick one of them
-                                        // Having multiple spawns is useful against AFK players so
-                                        // we don't have players spawning in/on top of eachother too much.
-                                        (function(spawn) {
-                                            var component = spawn.getComponent('spawnPoint');
+                var targetWorld = (function() {
+                    var defaultZone = IB_CONSTANTS.world.startLevel;
+                    var zone = targetZone || defaultZone;
+                    return $activeWorlds[zone] || $activeWorlds[defaultZone];
+                })();
 
-                                            if (component.tag === 'playerStart') {
-                                                player.position.copy(spawn.position);
-                                                player.rotation.copy(spawn.rotation);
-                                            }
-                                        })(_.sample(spawns));
-                                    }
+                if(!player) {
+                    $log.error('[GameService.resetPlayer] player not found!');
+                    return;
+                }
 
-                                    player.level = startLevel;
-                                }
+                if(!targetWorld) { 
+                    $log.error('[GameService.resetPlayer] world not found!');
+                    return;
+                }
 
-                                $activeWorlds[startLevel].addEntity(player);
+                var zone = targetWorld.name;
 
-                                delete player.__isResetting;
-                            }, 2000);
-                        }
-                    });
-                });
+                var spawns = _.chain(targetWorld.getEntities('spawnPoint'))
+                    .filter(function(spawnPoint) {
+                        return spawnPoint.getComponent('spawnPoint').tag === 'playerStart';
+                    })
+                    .map(function(spawnPoint) {
+                        return _.pick(spawnPoint, 'position', 'rotation');
+                    })
+                    .value();
 
-                return true;
+                var spawn = (function() {
+                    var defaultSpawn = {
+                        position : new THREE.Vector3(),
+                        rotation : new THREE.Euler()
+                    };
+                    var targetSpawn = _.sample(spawns);
+                    if(!targetSpawn) {
+                        $log.warn('[GameService.resetPlayer] spawn point not found ('+zone+')!');
+                    }
+                    return targetSpawn || defaultSpawn;
+                })();
+
+                var runReset = function(player, zone, spawn) {
+                    sourceWorld.removeEntity(player);
+                    player.position.copy(spawn.position);
+                    player.rotation.copy(spawn.rotation);
+                    player.level = zone;
+                    targetWorld.addEntity(player);
+                };
+
+                var scheduleReset = function(player, zone, spawn) {
+                    var delay = IB_CONSTANTS.world.resetDelay;
+                    if(!player.__isResetting) {
+                        player.__isResetting = true;
+                        setTimeout(function() {
+                            runReset(player, zone, spawn);
+                            delete player.__isResetting;
+                        }, delay);
+                    }
+                };
+
+                scheduleReset(player, zone, spawn);
+
             };
         }
     ])

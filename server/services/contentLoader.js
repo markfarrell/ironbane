@@ -3,9 +3,9 @@ angular
         'underscore',
         'global.constants',
         'engine.util',
-        'models.factions'
+        'models.npcs'
     ])
-    .service('ContentLoader', ["_", "FactionsCollection", "IB_CONSTANTS", "$q", "IbUtils", function(_, FactionsCollection, IB_CONSTANTS, $q, IbUtils) {
+    .service('ContentLoader', ["_", "NPCsCollection", "IB_CONSTANTS", "$q", "IbUtils", function(_, NPCsCollection, IB_CONSTANTS, $q, IbUtils) {
         'use strict';
 
         var parse = Meteor.npmRequire('csv-parse');
@@ -351,42 +351,15 @@ angular
                 return npcPrefabs;
 
 
-            }).then(function(prefabs) { // Prefabs -> Factions (ex. for client UI)
-                var factions = _.chain(prefabs)
-                    .pairs()
-                    .map(function(pair) { 
-                        var name = pair[0];
-                        var prefab = pair[1];
-                        var faction = prefab.components.fighter.faction;
-                        return [name, faction];
-                    })
-                    .groupBy(function(pair) { 
-                        var faction = pair[1];
-                        return faction;
-                    })
-                    .pairs()
-                    .map(function(pair) {
-                        var faction_name = pair[0];
-                        var faction_npcs = _.map(pair[1], _.first);
-                        return {
-                            name : faction_name,
-                            npcs: faction_npcs
-                        };
-                    })
-                    .reject(function(faction) {
-                        return !faction.name;
-                    })
-                    .value();
-                return factions;
-            }).then(Meteor.bindEnvironment(function(factions) { // Rewrite factions collection
-                FactionsCollection.remove({});
-                _.each(factions, function(faction) {
-                    faction.id = FactionsCollection.insert(faction); 
+            }).then(Meteor.bindEnvironment(function(prefabs) {
+                NPCsCollection.remove({});
+                _.each(prefabs, function(prefab) {
+                    prefab.id = NPCsCollection.insert(prefab); 
                 });
-                Meteor.publish('factions', function() {
-                    return FactionsCollection.find({});
+                Meteor.publish('npcs', function() {
+                    return NPCsCollection.find({});
                 });
-                console.log('Loaded ' + _.size(factions) + ' NPC factions into Meteor collection');
+                console.log('Loaded ' + _.size(prefabs) + ' NPC prefabs into Meteor collection');
             }));
         };
 

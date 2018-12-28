@@ -6,9 +6,9 @@ angular
         'models.chatRooms',
         'models.entities',
         'models.items',
+        'models.npcs',
         'models.inventory',
         'models.servers',
         'models.roles',
-        'models.factions',
         'models.zones'
     ]);

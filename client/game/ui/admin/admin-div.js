@@ -5,9 +5,9 @@ angular.module('game.ui.admin.adminDiv', [
         'angular-meteor',
         'engine.util',
         'models.zones',
-        'models.factions',
         'models.items',
         'services.items',
+        'services.npcs',
     ])
     .directive('adminDiv', [function() {
             'use strict';
@@ -19,7 +19,7 @@ angular.module('game.ui.admin.adminDiv', [
                 scope: {
                     cheats: '='
                 },
-                controller: ["_", "$scope", "$http", "$clientSettings", "ZonesCollection", "FactionsCollection", "ItemService", "CharBuilder", "IB_CONSTANTS", "IbUtils",'$meteor', function(_, $scope, $http, $clientSettings, ZonesCollection, FactionsCollection, ItemService, CharBuilder, IB_CONSTANTS, IbUtils, $meteor) {
+                controller: ["_", "$scope", "$http", "$clientSettings", "ZonesCollection", "ItemService", "NPCService", "CharBuilder", "IB_CONSTANTS", "IbUtils",'$meteor', function(_, $scope, $http, $clientSettings, ZonesCollection, ItemService, NPCService, CharBuilder, IB_CONSTANTS, IbUtils, $meteor) {
 
                     var ctrl = this;
 
@@ -40,10 +40,9 @@ angular.module('game.ui.admin.adminDiv', [
                     $scope.charImages = IB_CONSTANTS.charImages;
 
                     $meteor.subscribe("zones");
-                    $meteor.subscribe("factions");
 
                     $scope.zones = $meteor.collection(ZonesCollection);
-                    $scope.factions = $meteor.collection(FactionsCollection);
+                    $scope.factions = NPCService.getFactions();
 
                     var itemTemplates = {
                         rarities : ItemService.getItemTemplates("rarity"),

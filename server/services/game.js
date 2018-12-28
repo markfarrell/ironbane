@@ -5,6 +5,7 @@ angular
         'engine.entity-builder',
         'global.constants',
         'server.services.chat',
+        'server.services.zones',
         'three'
     ])
     .service('GameService', [
@@ -14,8 +15,9 @@ angular
         'IB_CONSTANTS',
         'EntityBuilder',
         'ChatService',
+        'ZonesService',
         'THREE',
-        function($log, EntitiesCollection, $activeWorlds, IB_CONSTANTS, EntityBuilder, ChatService, THREE) {
+        function($log, EntitiesCollection, $activeWorlds, IB_CONSTANTS, EntityBuilder, ChatService, ZonesService, THREE) {
             'use strict';
 
             this.enterGame = function(charId) {
@@ -134,7 +136,7 @@ angular
                 userExit(this.userId);
             };
 
-            this.resetPlayer = function(targetZone) {
+            this.resetPlayer = function(targetZone, targetSpawnPoint) {
 
                 var me = this;
 
@@ -165,28 +167,44 @@ angular
                     return;
                 }
 
-                var zone = targetWorld.name;
+                var findNPCSpawnPoint = function(world) {
+                    var spawnPositions = _.chain(ZonesService.getSpawnZones(world))
+                        .map(function(spawnZone) {
+                            return spawnZone.bounds;
+                        })
+                        .flatten()
+                        .map(function(boundingBox) {
+                            return [boundingBox.min, boundingBox.max];
+                        })
+                        .flatten()
+                        .value();
+                    var spawnPosition = _.sample(spawnPositions);
+                    if(!spawnPosition) {
+                        $log.warn('[GameService.resetPlayer] NPC spawn point not found ('+zone+')!');
+                        return;
+                    }
+                    return {
+                        position : spawnPosition,
+                        rotation: new THREE.Euler()
+                    };
+                }
 
-                var spawns = _.chain(targetWorld.getEntities('spawnPoint'))
-                    .filter(function(spawnPoint) {
-                        return spawnPoint.getComponent('spawnPoint').tag === 'playerStart';
-                    })
-                    .map(function(spawnPoint) {
-                        return _.pick(spawnPoint, 'position', 'rotation');
-                    })
-                    .value();
+                var findPlayerSpawnPoint = function(world) {
+                    var spawnPoint = _.sample(ZonesService.getSpawnPoints(world));
+                    if(!spawnPoint) {
+                        $log.warn('[GameService.resetPlayer] player spawn point not found ('+zone+')!');
+                    }
+                    return spawnPoint;
+                };
 
-                var spawn = (function() {
-                    var defaultSpawn = {
+                var findSpawnPoint = function(world) {
+                    var defaultSpawnPoint = {
                         position : new THREE.Vector3(),
                         rotation : new THREE.Euler()
                     };
-                    var targetSpawn = _.sample(spawns);
-                    if(!targetSpawn) {
-                        $log.warn('[GameService.resetPlayer] spawn point not found ('+zone+')!');
-                    }
-                    return targetSpawn || defaultSpawn;
-                })();
+                    var playerSpawnPoint = findPlayerSpawnPoint(world);
+                    return playerSpawnPoint || findNPCSpawnPoint(world) || defaultSpawnPoint;
+                };
 
                 var runReset = function(player, zone, spawn) {
                     sourceWorld.removeEntity(player);
@@ -207,7 +225,11 @@ angular
                     }
                 };
 
-                scheduleReset(player, zone, spawn);
+                var zone = targetWorld.name;
+
+                var spawnPoint = targetSpawnPoint || findSpawnPoint(targetWorld);
+
+                scheduleReset(player, zone, spawnPoint);
 
             };
         }

@@ -35,7 +35,7 @@ angular
             return meshes;
         };
 
-        var getBoundingBox = function(mesh) { 
+        var getBoundingBox = function(mesh) {
             if (!mesh.geometry.boundingBox) {
                 mesh.geometry.computeBoundingBox();
             }
@@ -44,10 +44,7 @@ angular
             var max3 = new THREE.Vector3(box.max.x,box.max.y,box.max.z);
             min3.applyMatrix4(mesh.matrixWorld);
             max3.applyMatrix4(mesh.matrixWorld);
-            return { 
-                min : { x : min3.x, y : min3.y, z : min3.z }, 
-                max : { x : max3.x, y : max3.y, z : max3.z }
-            };
+            return { min : min3, max : max3 };
         };
 
         var getBoundingBoxes = function(spawnZoneEntity) {
@@ -55,7 +52,20 @@ angular
             return _.map(meshes, getBoundingBox);
         };
 
-        this.getSpawnZones = function(world) {
+        var ZonesService = this;
+
+        ZonesService.getSpawnPoints = function(world) {
+            return _.chain(world.getEntities('spawnPoint'))
+                .filter(function(spawnPoint) {
+                    return spawnPoint.getComponent('spawnPoint').tag === 'playerStart';
+                })
+                .map(function(spawnPoint) {
+                    return _.pick(spawnPoint, 'position', 'rotation');
+                })
+                .value();
+        };
+
+        ZonesService.getSpawnZones = function(world) {
             return _.chain(world.getEntities('spawnZone'))
                 .map(function(spawnZoneEntity) {
                     return {
@@ -66,13 +76,21 @@ angular
                 .value();
         };
 
-        this.getSpawnList = function(world) {
-            var npcs = _.chain(world.getEntities('spawnZone'))
+        ZonesService.getSpawnList = function(world) {
+            return _.chain(world.getEntities('spawnZone'))
                 .map(getEntitySpawnList)
                 .flatten()
                 .uniq()
                 .value();
-                return npcs;
+        };
+
+        ZonesService.getZone = function(world) {
+            return {
+                name : world.name,
+                npcs : ZonesService.getSpawnList(world),
+                spawnZones : ZonesService.getSpawnZones(world),
+                spawnPoints : ZonesService.getSpawnPoints(world)
+            };
         };
 
     }])
@@ -150,13 +168,7 @@ angular
                     return deferred.promise;
                 });
 
-                var zonesPromise = $q.all(worldPromises).then(function(worlds) {
-                    return _.map(worlds, function(world) {
-                        return {name : world.name, npcs : ZonesService.getSpawnList(world)};
-                    });
-                });
-
-                zonesPromise.then(Meteor.bindEnvironment(function(zones) {
+                var buildZonesCollection = Meteor.bindEnvironment(function(zones) {
                     ZonesCollection.remove({});
                     _.each(zones, function(zone) {
                         zone.id = ZonesCollection.insert(zone);
@@ -165,7 +177,11 @@ angular
                         return ZonesCollection.find({});
                     });
                     console.log('Loaded ' + _.size(zones) + ' NPC zones into Meteor collection');
-                }));
+                });
+
+                var zonesPromise = $q.all(worldPromises).then(function(worlds) {
+                    return _.map(worlds, ZonesService.getZone);
+                }).then(buildZonesCollection);
 
             }), function (err) {
                 if (err) {

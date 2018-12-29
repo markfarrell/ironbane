@@ -15,5 +15,6 @@ angular
         'server.services.ironblood',
         'server.services.profiler',
         'server.services.servers',
-        'server.services.zones'
+        'server.services.zones',
+        'server.services.shell'
     ]);

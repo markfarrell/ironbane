@@ -29,6 +29,7 @@ angular.module('components', [
     'components.persisted',
     'components.pickup',
     'components.player',
+    'components.npc',
     'components.primitive',
     'components.proctree',
     'components.projectile',

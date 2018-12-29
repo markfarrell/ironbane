@@ -75,6 +75,8 @@ angular
 
                                             builtEntity.name = randomPrefabName;
 
+                                            builtEntity.addComponent('npc');
+
                                             world.addEntity(builtEntity);
 
                                             spawnZoneComponent.spawnList.push(builtEntity);

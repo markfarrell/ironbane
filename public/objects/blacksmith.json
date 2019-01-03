@@ -19524,6 +19524,17 @@
             "image": "22bfca44-4f7c-480d-9de7-afc60970255d",
             "name": "ashes_ashes.png",
             "anisotropy": 16
+        },
+        {
+            "uuid" : "ae2db627-fe33-424b-b192-76c1efd8f307", 
+            "offset" : [0,0],
+            "repeat" : [1,1],
+            "magFilter" : 1006,
+            "minFilter" : 1008,
+            "wrap" : [1001,1001],
+            "image" : "f1a4871d-291c-4d86-82e3-28d6bcec6f8e",
+            "name" : "Lightmap-0_comp_light.png",
+            "anisotropy" : 16
         }
     ],
     "images": [
@@ -19556,6 +19567,13 @@
             "uuid": "22bfca44-4f7c-480d-9de7-afc60970255d",
             "name": "ashes_ashes.png",
             "originalUrl": "ashes_ashes.png"
+        },
+        {
+            "url":"Lightmap-0_comp_light.png",
+            "uuid":"f1a4871d-291c-4d86-82e3-28d6bcec6f8e",
+            "name":"Lightmap-0_comp_light.png",
+            "originalUrl":
+            "Lightmap-0_comp_light.png"
         }
     ]
 }

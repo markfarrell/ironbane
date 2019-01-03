@@ -4170,6 +4170,17 @@
             "image": "a4e2fe2b-e979-40cb-b37b-75743aa1fedf",
             "name": "17_17.png",
             "anisotropy": 16
+        },
+        {
+            "uuid" : "ae2db627-fe33-424b-b192-76c1efd8f307", 
+            "offset" : [0,0],
+            "repeat" : [1,1],
+            "magFilter" : 1006,
+            "minFilter" : 1008,
+            "wrap" : [1001,1001],
+            "image" : "f1a4871d-291c-4d86-82e3-28d6bcec6f8e",
+            "name" : "Lightmap-0_comp_light.png",
+            "anisotropy" : 16
         }
     ],
     "images": [
@@ -4190,6 +4201,13 @@
             "uuid": "a4e2fe2b-e979-40cb-b37b-75743aa1fedf",
             "name": "17_17.png",
             "originalUrl": "17_17.png"
+        },
+        {
+            "url":"Lightmap-0_comp_light.png",
+            "uuid":"f1a4871d-291c-4d86-82e3-28d6bcec6f8e",
+            "name":"Lightmap-0_comp_light.png",
+            "originalUrl":
+            "Lightmap-0_comp_light.png"
         }
     ]
 }

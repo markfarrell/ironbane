@@ -144,15 +144,7 @@ angular
                         charName: charName
                     },
                     components: {
-                        inventory: ContentLoader.buildInventory([
-                            'Potion 100%',
-                            'Potion 100%',
-                        ], [
-                            'Dull Sword',
-                            'Peasant Shirt',
-                            'Dirty Dishcloth Bandana',
-                            'Old Shoes'
-                        ])
+                        inventory: ContentLoader.buildInventory([], [])
                     }
                 }, function(err) {
                     if (err) {

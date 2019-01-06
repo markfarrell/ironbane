@@ -4,7 +4,6 @@ angular
         'three',
         'engine.geometryCache',
         'engine.materialCache',
-        'services.contentLoader',
         'prefabs'
     ])
     .service('EntityBuilder', [
@@ -15,8 +14,7 @@ angular
         '$injector',
         '$log',
         '$q',
-        'ContentLoader',
-        function(Entity, THREE, $geometryCache, $materialCache, $injector, $log, $q, ContentLoader) {
+        function(Entity, THREE, $geometryCache, $materialCache, $injector, $log, $q) {
             'use strict';
 
             var objectLoader = new THREE.ObjectLoader();
@@ -28,27 +26,20 @@ angular
 
                     var componentData = {};
 
-                    // Check if the prefab can be found in the spreadsheet
-                    // These are usually NPC's and thus can only be added through the server
-                    if (Meteor.isServer && ContentLoader.hasNPCPrefab(prefabName)) {
-                        angular.extend(componentData, ContentLoader.getNPCPrefab(prefabName));
+                    try {
+                        prefabFactory = $injector.get(prefabFactoryName);
+                    } catch (err) {
+                        $log.debug('[EntityBuilder] Error Loading Prefab: ', prefabFactoryName, ' ERR: ', err.message);
                     }
-                    else {
-                        try {
-                            prefabFactory = $injector.get(prefabFactoryName);
-                        } catch (err) {
-                            $log.debug('[EntityBuilder] Error Loading Prefab: ', prefabFactoryName, ' ERR: ', err.message);
-                        }
 
-                        if (prefabFactory) {
-                            if (angular.isFunction(prefabFactory)) {
-                                // if the prefab entity is a function, then it should produce
-                                // the needed data
-                                angular.extend(componentData, prefabFactory(originalConfigData));
-                            } else {
-                                // else assume the prefab obj is just a JSON (Constant)
-                                angular.extend(componentData, prefabFactory);
-                            }
+                    if (prefabFactory) {
+                        if (angular.isFunction(prefabFactory)) {
+                            // if the prefab entity is a function, then it should produce
+                            // the needed data
+                            angular.extend(componentData, prefabFactory(originalConfigData));
+                        } else {
+                            // else assume the prefab obj is just a JSON (Constant)
+                            angular.extend(componentData, prefabFactory);
                         }
                     }
 

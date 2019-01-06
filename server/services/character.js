@@ -2,8 +2,7 @@
 angular
     .module('server.services.character', [
         'underscore',
-        'global.constants',
-        'services.contentLoader'
+        'global.constants'
     ])
     .service('CharacterService', [
         '_',
@@ -11,8 +10,7 @@ angular
         '$log',
         'IB_CONSTANTS',
         'EntitiesCollection',
-        'ContentLoader',
-        function(_, $activeWorlds, $log, IB_CONSTANTS, EntitiesCollection, ContentLoader) {
+        function(_, $activeWorlds, $log, IB_CONSTANTS, EntitiesCollection) {
             'use strict';
 
             this.getActiveCharacter = function(userId) {
@@ -144,7 +142,7 @@ angular
                         charName: charName
                     },
                     components: {
-                        inventory: ContentLoader.buildInventory([], [])
+                        inventory: {}
                     }
                 }, function(err) {
                     if (err) {

@@ -16,5 +16,5 @@ angular
         'prefabs.proctree',
         'prefabs.waterFountain',
         'prefabs.worldMesh',
-        'prefabs.villager'
+        'prefabs.human'
     ]);

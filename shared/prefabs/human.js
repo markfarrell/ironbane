@@ -1,10 +1,11 @@
 angular
-    .module('prefabs.villager', []).factory('VillagerPrefab', [
+    .module('prefabs.human', []).factory('HumanPrefab', [
         function() {
             'use strict';
             return function(data) {
+                var userData = data.userData || {};
                 return {
-                    name : "Villager",
+                    name : "Human",
                     gold: 0,
                     inventory : {},
                     components: {
@@ -13,7 +14,7 @@ angular
                             transparent: true,
                             width: 1,
                             height: 1,
-                            charBuildData: data.charBuildData || {}
+                            charBuildData: userData.charBuildData || {}
                         },
                         rigidBody: {
                             shape: {

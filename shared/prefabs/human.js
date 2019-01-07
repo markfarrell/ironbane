@@ -1,13 +1,9 @@
 angular
-    .module('prefabs.human', []).factory('HumanPrefab', [
-        function() {
+    .module('prefabs.human', []).factory('HumanPrefab', [,
+        function(IbUtils) {
             'use strict';
             return function(data) {
-                var userData = data.userData || {};
                 return {
-                    name : "Human",
-                    gold: 0,
-                    inventory : {},
                     components: {
                         npc : {},
                         quad: {
